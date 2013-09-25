@@ -224,13 +224,15 @@ class SinKVDBTest(unittest.TestCase):
         
         self.kvdb.commit()
         
-        self.assertEquals(self.kvdb['bool'], None, 'bool not eq')
-        self.assertEquals(self.kvdb['int'], None, 'int not eq')
-        self.assertEquals(self.kvdb['str'], None, 'str not eq')
-        self.assertEquals(self.kvdb['float'], None, 'float not eq')
-        self.assertEquals(self.kvdb['dict'], None, 'dict not eq')
-        self.assertEquals(self.kvdb['list'], None, 'list not eq')
-        self.assertEquals(self.kvdb['tuple'], None, 'tuple not eq')
+        self.assertEquals(self.kvdb['bool'], None, 'bool not deleted')
+        self.assertEquals(self.kvdb['int'], None, 'int not deleted')
+        self.assertEquals(self.kvdb['str'], None, 'str not deleted')
+        self.assertEquals(self.kvdb['float'], None, 'float not deleted')
+        self.assertEquals(self.kvdb['dict'], None, 'dict not deleted')
+        self.assertEquals(self.kvdb['list'], None, 'list not deleted')
+        self.assertEquals(self.kvdb['tuple'], None, 'tuple not deleted')
+
+        
     
 if __name__ == '__main__':
     unittest.main()
