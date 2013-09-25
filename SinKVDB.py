@@ -131,7 +131,7 @@ class SinKVDBTest(unittest.TestCase):
     def __init__(self, methodName):
         unittest.TestCase.__init__(self, methodName)
         con = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
-        self.kvdb = SinKVDB(dbcon=con, table='trb', tag='test', reset=True)
+        self.kvdb = SinKVDB(dbcon=con, table='trb', tag='test', reset=False, debug=True)
         
         self.predict = {}   # Hold key-values witch will be tested.
         self.predict['bool'] = True
