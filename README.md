@@ -28,20 +28,20 @@ kvdb['morinfo'] = {'giturl':'https://github.com/sintrb/'}</code></pre>
 ##Advanced
 There are some advanced things of SinKVDB:
 * Like Dictionary's items() function: get all key-value pairs and print it
-<pre><code>for (k,v) in self.kvdb.items():
+<pre><code>for (k,v) in kvdb.items():
 ----print 'key:%s\tval:%s'%(k,v)
 </code></pre>
 
 * Cooler items(): get all key-value pairs witch key contain 'i' and print it
-<pre><code>for (k,v) in self.kvdb.items('%i%'):
+<pre><code>for (k,v) in kvdb.items('%i%'):
 ----print 'key:%s\tval:%s'%(k,v)
 </code></pre>
 
 * Of course, you only get keys or values like this.
-<pre><code>for k in self.kvdb.keys():
+<pre><code>for k in kvdb.keys():
 ----print k
 # or
-for v in self.kvdb.values():
+for v in kvdb.values():
 ----print v
 </code></pre>
 
