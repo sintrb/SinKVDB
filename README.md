@@ -1,11 +1,12 @@
-SinKVDB
-=======
+#SinKVDB
 
+
+##About
 A Python Key-Value Database.
-=======
 
-Now, SinKVDB support: None, boolean, integer, float, string, dictionary, list, tuple.
+Now, SinKVDB support: *None*, *boolean*, *integer*, *float*, *string*, *dictionary*, *list*, *tuple*.
 
+##How to use
 You can use SinKVDB like this follow:
 
 * Create a MySQL connection.
@@ -22,5 +23,18 @@ kvdb['email'] = ['sintrb@gmail.com', 'trbbadboy@qq.com']
 kvdb['morinfo'] = {'giturl':'https://github.com/sintrb/'}</code></pre>
 
 * At last, maybe commit is necessary.
-<pre><code>kvdb.dbcon.commit()</code></pre>
+<pre><code>kvdb.commit()</code></pre>
+
+##Advanced
+There are some advanced things of SinKVDB:
+* Like Dictionary's items() function: get all key-value pairs and print it
+<pre><code>for (k,v) in self.kvdb.items():
+----print 'key:%s\tval:%s'%(k,v)
+</code></pre>
+
+* Cooler items(): get all key-value pairs witch key contain 'i' and print it
+<pre><code>for (k,v) in self.kvdb.items('%i%'):
+----print 'key:%s\tval:%s'%(k,v)
+</code></pre>
+
 
