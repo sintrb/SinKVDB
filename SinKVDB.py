@@ -173,6 +173,24 @@ class SinKVDB(object):
     def __delitem__(self, key):
         return self.__execsql__('DELETE FROM `'+self.table+'` WHERE `key`=%s and `tag`=%s LIMIT 1', [key, self.tag])
 
+
+    def get_all(self, keyfilter=None):
+        '''
+        Get all record by key filter.
+        Filter is supported as SQL LIKE filter 
+        '''
+        if not keyfilter:
+            keyfilter = '%'
+        return self.__sql2array__('SELECT * FROM `'+self.table+'` WHERE `key` LIKE %s and `tag`=%s', [keyfilter, self.tag])
+    
+    def items(self, keyfilter=None):
+        '''
+        Get all key-value pair by key filter.
+        Filter is supported as SQL LIKE filter 
+        '''
+        objs = self.get_all(keyfilter)
+        return [(obj['key'],obj['value']) for obj in objs]
+    
 import unittest
 class SinKVDBTest(unittest.TestCase):
     '''
@@ -182,7 +200,7 @@ class SinKVDBTest(unittest.TestCase):
         unittest.TestCase.__init__(self, methodName)
         if not hasattr(SinKVDBTest, 'kvdb'):
             con = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
-            SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=True)
+            SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=False)
         self.kvdb = SinKVDBTest.kvdb
         
         self.predict = {}   # Hold key-values witch will be tested.
@@ -213,7 +231,12 @@ class SinKVDBTest(unittest.TestCase):
         self.assertListEqual(list(self.kvdb['list']), self.predict['list'], 'list not eq')
         self.assertListEqual(list(self.kvdb['tuple']), list(self.predict['tuple']), 'tuple not eq')
     
-    def test3Del(self):
+    def test3Items(self):
+        # get all key-value pair witch key contain 'i'
+        for (k,v) in self.kvdb.items('%i%'):
+            print 'key:%s\tval:%s'%(k,v)
+    
+    def test4Del(self):
         del self.kvdb['bool']
         del self.kvdb['int']
         del self.kvdb['str']
@@ -236,7 +259,6 @@ class SinKVDBTest(unittest.TestCase):
     
 if __name__ == '__main__':
     unittest.main()
-    SinKVDB(1, 1, 1, 1, 1)
 
     
     
