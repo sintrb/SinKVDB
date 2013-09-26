@@ -147,13 +147,21 @@ class SinKVDB(object):
         '''
         return self.dbcon.commit()
     
+    def __getval__(self, obj):
+        '''
+        Get the record's value.
+        It will switch to list, tuple or a dictionary
+        if this record's type is json.
+        '''
+        if obj['type'] == 'json':
+            return json.loads(obj['value'])
+        else:
+            return obj['value']
+    
     def __getitem__(self, key):
         obj = self.get_one(key)
         if obj:
-            if obj['type'] == 'json':
-                return json.loads(obj['value'])
-            else:
-                return obj['value']
+            return self.__getval__(obj)
         else:
             return None
     
@@ -189,7 +197,23 @@ class SinKVDB(object):
         Filter is supported as SQL LIKE filter 
         '''
         objs = self.get_all(keyfilter)
-        return [(obj['key'],obj['value']) for obj in objs]
+        return [(obj['key'],self.__getval__(obj)) for obj in objs]
+    
+    def keys(self, keyfilter=None):
+        '''
+        Get all key of KVDB by key filter.
+        Filter is supported as SQL LIKE filter 
+        '''
+        objs = self.get_all(keyfilter)
+        return [obj['key'] for obj in objs]
+    
+    def values(self, keyfilter=None):
+        '''
+        Get all value of KVDB by key filter.
+        Filter is supported as SQL LIKE filter 
+        '''
+        objs = self.get_all(keyfilter)
+        return [self.__getval__(obj) for obj in objs]
     
 import unittest
 class SinKVDBTest(unittest.TestCase):
@@ -235,8 +259,13 @@ class SinKVDBTest(unittest.TestCase):
         # get all key-value pair witch key contain 'i'
         for (k,v) in self.kvdb.items('%i%'):
             print 'key:%s\tval:%s'%(k,v)
-    
-    def test4Del(self):
+
+    def test3KeysValues(self):
+        # get all key-value pair witch key contain 'i'
+        print self.kvdb.keys()
+        print self.kvdb.values()
+
+    def test5Del(self):
         del self.kvdb['bool']
         del self.kvdb['int']
         del self.kvdb['str']
