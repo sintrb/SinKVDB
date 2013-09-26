@@ -37,4 +37,11 @@ There are some advanced things of SinKVDB:
 ----print 'key:%s\tval:%s'%(k,v)
 </code></pre>
 
+* Of course, you only get keys or values like this.
+<pre><code>for k in self.kvdb.keys():
+----print k
+# or
+for v in self.kvdb.values():
+----print v
+</code></pre>
 
