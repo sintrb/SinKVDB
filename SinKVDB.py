@@ -36,6 +36,22 @@ class SinKVDB(object):
     '''
     A Python Key-Value Database.
     '''
+    maparr = [
+            (type(None), 'none', str, eval),
+            (type(1),'int', str, int),
+            (type(True),'bool', str, eval),
+            (type(1.0),'float', str, float),
+            (type('s'),'string', str, str),
+            (type({}),'dict', json.dumps, json.loads),
+            (type([]),'list', json.dumps, json.loads),
+            (type(()),'tuple', json.dumps, json.loads),
+        ]
+    
+    
+    typemap = dict(((a[0], a[1]) for a in maparr))
+    convmap = dict(((a[0], a[2]) for a in maparr))
+    valumap = dict(((a[1], a[3]) for a in maparr))
+    
     def __init__(self, dbcon=None, table=None, tag=None, reset=False, debug = False):
         '''
         A Python Key-Value Database.
@@ -153,10 +169,9 @@ class SinKVDB(object):
         It will switch to list, tuple or a dictionary
         if this record's type is json.
         '''
-        if obj['type'] == 'json':
-            return json.loads(obj['value'])
-        else:
-            return obj['value']
+        if not obj['type'] in SinKVDB.valumap:
+            raise Exception('Not support type of: %s'%obj['type'])
+        return SinKVDB.valumap[obj['type']](obj['value'])
     
     def __getitem__(self, key):
         obj = self.get_one(key)
@@ -166,15 +181,12 @@ class SinKVDB(object):
             return None
     
     def __setitem__(self, key, value):
-        ctype = None
-        if type(value) in (types.DictType, types.ListType, types.TupleType):
-            ctype = 'json'
-            value = json.dumps(value)
-        elif type(value) not in (types.NoneType, types.LongType, types.IntType, types.BooleanType, types.FloatType, types.StringType):
-            raise Exception('Not support value type: %s'%type(value))
-        
-        if not self.set_one(key, value, ctype):
-            return self.add_one(key, value, ctype)
+        if not type(value) in SinKVDB.typemap:
+            raise Exception('Not support type of: %s'%type(value))
+        ctype = SinKVDB.typemap[type(value)]
+        cvalue = SinKVDB.convmap[type(value)](value)
+        if not self.set_one(key, cvalue, ctype):
+            return self.add_one(key, cvalue, ctype)
         else:
             return True
         
@@ -226,7 +238,6 @@ class SinKVDBTest(unittest.TestCase):
             con = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
             SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=False)
         self.kvdb = SinKVDBTest.kvdb
-        
         self.predict = {}   # Hold key-values witch will be tested.
         self.predict['bool'] = True
         self.predict['str'] = 'this is string'
@@ -247,14 +258,14 @@ class SinKVDBTest(unittest.TestCase):
             self.kvdb[k]
             
     def test2Comp(self):
-        self.assertEquals(bool(self.kvdb['bool']), bool(self.predict['bool']), 'bool not eq')
-        self.assertEquals(self.kvdb['int'], str(self.predict['int']), 'int not eq')
-        self.assertEquals(self.kvdb['str'], str(self.predict['str']), 'str not eq')
-        self.assertEquals(self.kvdb['float'], str(self.predict['float']), 'float not eq')
+        self.assertEquals(self.kvdb['bool'], self.predict['bool'], 'bool not eq')
+        self.assertEquals(self.kvdb['int'], self.predict['int'], 'int not eq')
+        self.assertEquals(self.kvdb['str'], self.predict['str'], 'str not eq')
+        self.assertEquals(self.kvdb['float'], self.predict['float'], 'float not eq')
         self.assertDictEqual(self.kvdb['dict'], self.predict['dict'], 'dict not eq')
-        self.assertListEqual(list(self.kvdb['list']), self.predict['list'], 'list not eq')
-        self.assertListEqual(list(self.kvdb['tuple']), list(self.predict['tuple']), 'tuple not eq')
-    
+        self.assertListEqual(self.kvdb['list'], self.predict['list'], 'list not eq')
+        self.assertTupleEqual(tuple(self.kvdb['tuple']), self.predict['tuple'], 'tuple not eq')
+        
     def test3Items(self):
         # get all key-value pair witch key contain 'i'
         for (k,v) in self.kvdb.items('%i%'):
