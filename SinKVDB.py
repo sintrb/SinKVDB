@@ -8,7 +8,6 @@ Created on 2013-9-23
 import MySQLdb
 import time
 import json
-import types
 
 __version__ = '1.0'
 
@@ -295,8 +294,7 @@ class SinKVDBTest(unittest.TestCase):
         self.assertEquals(self.kvdb['list'], None, 'list not deleted')
         self.assertEquals(self.kvdb['tuple'], None, 'tuple not deleted')
 
-        
-    
+
 if __name__ == '__main__':
     unittest.main()
 
