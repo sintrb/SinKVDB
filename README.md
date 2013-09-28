@@ -45,3 +45,11 @@ for v in kvdb.values():
 ----print v
 </code></pre>
 
+* Delete and Contains is also supported.
+<pre><code>del kvdb['name']	#delete key-value pair witch key is 'name'
+print 'name' in kvdb # judge key 'name' whether in this KVDB
+</code></pre>
+
+
+
+
