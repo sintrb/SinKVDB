@@ -15,7 +15,7 @@ class SinKVDBTest(unittest.TestCase):
         unittest.TestCase.__init__(self, methodName)
         if not hasattr(SinKVDBTest, 'kvdb'):
             con = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
-            SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=True)
+            SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=False, cache=True, cachesize=4)
         self.kvdb = SinKVDBTest.kvdb
         self.predict = {}   # Hold key-values witch will be tested.
         self.predict['bool'] = True

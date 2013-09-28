@@ -7,8 +7,9 @@ Created on 2013-9-23
 
 import time
 import json
+import random
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 __TPL_DELETETABLE__ = '''
 DROP TABLE IF EXISTS `%s`;
@@ -50,7 +51,7 @@ class SinKVDB(object):
     convmap = dict(((a[0], a[2]) for a in maparr))
     valumap = dict(((a[1], a[3]) for a in maparr))
     
-    def __init__(self, dbcon=None, table=None, tag=None, cache=True, reset=False, debug = False):
+    def __init__(self, dbcon=None, table=None, tag=None, cache=True, cachesize=10, reset=False, debug = False):
         '''
         A Python Key-Value Database.
         @dbcon Database connection
@@ -63,7 +64,13 @@ class SinKVDB(object):
         self.table = table
         self.tag = tag
         self.debug = debug
+        
+        # whether use cache
         self.cache = cache
+        
+        # the max cache count
+        self.cachesize = cachesize
+        
         self.__pingdb__()
         if reset:
             self.reset_table()
@@ -180,6 +187,7 @@ class SinKVDB(object):
     def __getitem__(self, key):
         if self.cache and key in self.__cache__:
             # return from cache
+            print 'from cache:%s'%key
             return self.__cache__[key]
         
         obj = self.get_one(key)
@@ -194,7 +202,10 @@ class SinKVDB(object):
         ctype = SinKVDB.typemap[type(value)]
         cvalue = SinKVDB.convmap[type(value)](value)
         if self.cache:
-            self.__cache__[key] = value
+            if len(self.__cache__)<self.cachesize or key in self.__cache__:
+                self.__cache__[key] = value
+            else:
+                del self.__cache__[random.choice(self.__cache__.keys())]
         if not self.set_one(key, cvalue, ctype):
             return self.add_one(key, cvalue, ctype)
         else:
