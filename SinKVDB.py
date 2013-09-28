@@ -186,6 +186,10 @@ class SinKVDB(object):
         return SinKVDB.valumap[obj['type']](obj['value'])
     
     def __getitem__(self, key):
+        '''
+        Get item value, like this:
+            print kvdb['key']
+        '''
         if self.cache and key in self.__cache__:
             # return from cache
             print 'from cache:%s'%key
@@ -198,6 +202,10 @@ class SinKVDB(object):
             return None
     
     def __setitem__(self, key, value):
+        '''
+        Set item value, like this:
+            kvdb['key'] = '123456789'
+        '''
         if not type(value) in SinKVDB.typemap:
             raise Exception('Not support type of: %s'%type(value))
         ctype = SinKVDB.typemap[type(value)]
@@ -213,12 +221,22 @@ class SinKVDB(object):
             return True
         
     def __delitem__(self, key):
+        '''
+        Delete key-value pair from KVDB, like this:
+        del kvdb['key']
+        '''
         if self.cache and key in self.__cache__:
             # delete from cache
             del self.__cache__[key]
             
         return self.__execsql__('DELETE FROM `'+self.table+'` WHERE `key`=%s and `tag`=%s LIMIT 1', [key, self.tag])
-
+    
+    def __contains__(self, key):
+        '''
+        Judge the key whether contain in this KVDB, like this:
+        print 'key' in kvdb
+        '''
+        return self.get_one(key) != None
 
     def get_all(self, keyfilter=None):
         '''

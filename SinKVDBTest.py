@@ -50,12 +50,18 @@ class SinKVDBTest(unittest.TestCase):
         for (k,v) in self.kvdb.items('%i%'):
             print 'key:%s\tval:%s'%(k,v)
 
-    def test3KeysValues(self):
-        # get all key-value pair witch key contain 'i'
+    def test4KeysValues(self):
+        # get all key-value pair
         print self.kvdb.keys()
         print self.kvdb.values()
 
-    def test5Del(self):
+    def test5Contain(self):
+        # test __contains__
+        self.assertTrue('int' in self.kvdb, 'not contain key:int')
+        self.assertTrue(not 'nokey' in self.kvdb, 'contain a not exist key:nokey')
+
+    def test6Del(self):
+        # test delete
         del self.kvdb['bool']
         del self.kvdb['int']
         del self.kvdb['str']
