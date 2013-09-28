@@ -51,7 +51,7 @@ class SinKVDB(object):
     convmap = dict(((a[0], a[2]) for a in maparr))
     valumap = dict(((a[1], a[3]) for a in maparr))
     
-    def __init__(self, dbcon=None, table=None, tag=None, reset=False, debug = False):
+    def __init__(self, dbcon=None, table=None, tag=None, cache=True, reset=False, debug = False):
         '''
         A Python Key-Value Database.
         @dbcon Database connection
@@ -64,17 +64,23 @@ class SinKVDB(object):
         self.table = table
         self.tag = tag
         self.debug = debug
+        self.cache = cache
         self.__pingdb__()
         if reset:
             self.reset_table()
         else:
             self.__create_table__()
         
+        # internal cache
+        if self.cache:
+            self.__cache__ = {}
     
     def __delete_table__(self):
         '''
         Delete the table
         '''
+        if self.cache:
+            self.__cache__.clear()
         return self.__execsql__(__TPL_DELETETABLE__%self.table)
     
     def __create_table__(self):
@@ -173,6 +179,10 @@ class SinKVDB(object):
         return SinKVDB.valumap[obj['type']](obj['value'])
     
     def __getitem__(self, key):
+        if self.cache and key in self.__cache__:
+            # return from cache
+            return self.__cache__[key]
+        
         obj = self.get_one(key)
         if obj:
             return self.__getval__(obj)
@@ -184,12 +194,18 @@ class SinKVDB(object):
             raise Exception('Not support type of: %s'%type(value))
         ctype = SinKVDB.typemap[type(value)]
         cvalue = SinKVDB.convmap[type(value)](value)
+        if self.cache:
+            self.__cache__[key] = value
         if not self.set_one(key, cvalue, ctype):
             return self.add_one(key, cvalue, ctype)
         else:
             return True
         
     def __delitem__(self, key):
+        if self.cache and key in self.__cache__:
+            # delete from cache
+            del self.__cache__[key]
+            
         return self.__execsql__('DELETE FROM `'+self.table+'` WHERE `key`=%s and `tag`=%s LIMIT 1', [key, self.tag])
 
 
@@ -235,7 +251,7 @@ class SinKVDBTest(unittest.TestCase):
         unittest.TestCase.__init__(self, methodName)
         if not hasattr(SinKVDBTest, 'kvdb'):
             con = MySQLdb.connect(host='127.0.0.1', user='trb', passwd='123', db='dbp', port=3306)
-            SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=False)
+            SinKVDBTest.kvdb = SinKVDB(dbcon=con, table='tb_mykvdb', tag='test', reset=False, debug=True)
         self.kvdb = SinKVDBTest.kvdb
         self.predict = {}   # Hold key-values witch will be tested.
         self.predict['bool'] = True
