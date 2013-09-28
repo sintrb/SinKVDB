@@ -3,6 +3,7 @@
 Created on 2013-9-23
 
 @author: RobinTang
+@see: https://github.com/sintrb/SinKVDB
 '''
 
 import time
