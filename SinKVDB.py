@@ -42,6 +42,7 @@ class SinKVDB(object):
 			(type(True),'bool', str, eval),
 			(type(1.0),'float', str, float),
 			(type('s'),'string', str, str),
+			(type(u's'),'unicode', str, str),
 			(type({}),'dict', json.dumps, json.loads),
 			(type([]),'list', json.dumps, json.loads),
 			(type(()),'tuple', json.dumps, json.loads),
