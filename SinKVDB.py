@@ -53,7 +53,7 @@ class SinKVDB(object):
 	convmap = dict(((a[0], a[2]) for a in maparr))
 	valumap = dict(((a[1], a[3]) for a in maparr))
 	
-	def __init__(self, dbcon=None, table=None, tag=None, cache=True, cachesize=10, reset=False, debug = False):
+	def __init__(self, dbcon=None, table=None, tag=None, cache=True, cachesize=10, reset=False, debug = False, autocommit=False):
 		'''
 		A Python Key-Value Database.
 		@dbcon Database connection
@@ -61,12 +61,13 @@ class SinKVDB(object):
 		@tag A tag, in most time, you use this tag to distinguish different KVDB in same table
 		@reset Reset the table or not
 		@debug In debug mode or not
+		@autocommit Auto commit database after each changing operating or not
 		'''
 		self.dbcon = dbcon
 		self.table = table
 		self.tag = tag
 		self.debug = debug
-		
+		self.autocommit = autocommit
 		# whether use cache
 		self.cache = cache
 		
@@ -220,10 +221,12 @@ class SinKVDB(object):
 				self.__cache__[key] = value
 			else:
 				del self.__cache__[random.choice(self.__cache__.keys())]
-		if not self.set_one(key, cvalue, ctype):
-			return self.add_one(key, cvalue, ctype)
-		else:
-			return True
+		res = self.set_one(key, cvalue, ctype)
+		if not res:
+			res = self.add_one(key, cvalue, ctype)
+		if res and self.autocommit:
+			self.commit()
+		return res
 		
 	def __delitem__(self, key):
 		'''
@@ -234,7 +237,10 @@ class SinKVDB(object):
 			# delete from cache
 			del self.__cache__[key]
 			
-		return self.__execsql__('DELETE FROM `'+self.table+'` WHERE `key`=%s and `tag`=%s LIMIT 1', [key, self.tag])
+		res = self.__execsql__('DELETE FROM `'+self.table+'` WHERE `key`=%s and `tag`=%s LIMIT 1', [key, self.tag])
+		if res and self.autocommit:
+			self.commit()
+		return res
 	
 	def __contains__(self, key):
 		'''
