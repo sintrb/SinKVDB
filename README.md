@@ -22,10 +22,10 @@ kvdb['weight'] = 67.5
 kvdb['email'] = ['sintrb@gmail.com', 'trbbadboy@qq.com']
 kvdb['morinfo'] = {'giturl':'https://github.com/sintrb/'}</code></pre>
 
-* At last, maybe commit is necessary.
+* At last, maybe commit is necessary. If you set autocommit=True when you creaye KVDB, the follow is unnecessary.
 <pre><code>kvdb.commit()</code></pre>
 
-##Advanced
+##Advanced Dictionary Functions
 There are some advanced things of SinKVDB:
 * Like Dictionary's items() function: get all key-value pairs and print it
 <pre><code>for (k,v) in kvdb.items():
