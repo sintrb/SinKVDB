@@ -281,4 +281,12 @@ class SinKVDB(object):
 		'''
 		objs = self.get_all(keyfilter)
 		return [self.__getval__(obj) for obj in objs]
-	
+	def last(self, keyfilter=None):
+		if not keyfilter:
+			keyfilter = '%'
+		objs = self.__sql2array__('SELECT * FROM `'+self.table+'` WHERE `key` LIKE %s and `tag`=%s ORDER BY `id` DESC LIMIT 1', [keyfilter, self.tag])
+		if objs:
+			return objs[0]['key'], self.__getval__(objs[0])
+		else:
+			return None
+
