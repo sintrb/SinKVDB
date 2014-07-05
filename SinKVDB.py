@@ -281,6 +281,7 @@ class SinKVDB(object):
 		'''
 		objs = self.get_all(keyfilter)
 		return [self.__getval__(obj) for obj in objs]
+
 	def last(self, keyfilter=None):
 		if not keyfilter:
 			keyfilter = '%'
