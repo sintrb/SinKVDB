@@ -84,6 +84,14 @@ class SinKVDBTest(unittest.TestCase):
 		self.assertEquals(self.kvdb['list'], None, 'list not deleted')
 		self.assertEquals(self.kvdb['tuple'], None, 'tuple not deleted')
 
+	def test7Last(self):
+		import time
+		tm = time.time()
+		self.kvdb[str(tm)] = tm
+		self.kvdb.commit()
+		lst = self.kvdb.last()
+		self.assertEquals(str(lst[1]), str(tm), '.last() fail')
+
 
 if __name__ == '__main__':
 	unittest.main()
