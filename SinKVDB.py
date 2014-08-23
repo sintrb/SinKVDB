@@ -256,7 +256,7 @@ class SinKVDB(object):
 		'''
 		if not keyfilter:
 			keyfilter = '%'
-		return self.__sql2array__('SELECT * FROM `'+self.table+'` WHERE `key` LIKE %s and `tag`=%s', [keyfilter, self.tag])
+		return self.__sql2array__('SELECT * FROM `'+self.table+'` WHERE `key` LIKE %s and `tag`=%s ORDER BY `id`', [keyfilter, self.tag])
 	
 	def items(self, keyfilter=None):
 		'''
